@@ -36,19 +36,32 @@ const writeCounter = (count, callback) => {
 };
 
 // Public API - Fix this function //////////////////////////////////////////////
-
+// The purpose of this function is to read the last ID created 
+// At counter.txt and then increments that ID, saves the new ID to 
+// Counter.txt and then returns that new idea
 exports.getNextUniqueId = (callback) => {
+  //declare the count variable
   var counter;
+  // Declare the path where we want to get/set our id's from
   var path =  __dirname + '/counter.txt';
+  // We're grabbing the last used ID, so that it can be incremented later
   fs.readFile(path, (err, data) => {
     if (err) throw err;
+    // It increments the counter, toString because the data is stored as a buffer
+    // PareseInt because you can't increment a string
     counter = parseInt(data.toString()) + 1;
+    // Now that we have incremented our count, we need to re-write the count
+    // In the counter.txt
     fs.writeFile(path, counter, (err) => {
       if (err) throw err;
+      // If not an error we call the createNewFileCallback function and
+      // Pass in the new ID
+      // The zeroPaddedNumber takes a number and adds zeros in front of it
       callback(zeroPaddedNumber(counter))
     });
   });
 };
+
 
 
 
