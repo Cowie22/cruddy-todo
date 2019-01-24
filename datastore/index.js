@@ -20,12 +20,12 @@ exports.create = (text, callback) => {
     fs.writeFile(path, text, (err) => {
       // If there is an error, such as invalid path, or permission error
       // Throw an error
-      if (err) throw err;
+      if (err) { throw err; }
       // Otherwise trigger the callback passed in from server.js
       // Callback sends response.body with newly created todo object
       callback(null, { id, text });
     });
-  }
+  };
   // Calling the get unique ID method that was imported from counter.js
   // This method grabs a persistently unique ID from our database
   // Because of the asynchrounous nature, we have to pass our callback into
@@ -42,7 +42,7 @@ exports.readAll = (callback) => {
   var path = __dirname + '/data';
   // Declare a temp data array, which will store all our text document objects
   // That will eventually be sent as the response body to the client
-  var data = []
+  var data = [];
   // Read the /data directory and reurn an array of the files in that directory
   fs.readdir(path, (err, files) => {
     // Set i as 0 so we can increment over the files array using i
@@ -71,13 +71,13 @@ exports.readAll = (callback) => {
           // Otherwise pass the complete data array containing all our files
           // Into the callback passed in from server.js which will handle 
           // Sending the data array to the client
-          callback(null, data)
+          callback(null, data);
         }
       });
-    }
+    };
     // Call the iterator function and pass in the intial i value
     iterator(i);
-  })
+  });
 };
 
 exports.readOne = (id, callback) => {
@@ -106,7 +106,7 @@ exports.update = (id, text, callback) => {
         }
       });
     }
-  })
+  });
 };
 
 exports.delete = (id, callback) => {
