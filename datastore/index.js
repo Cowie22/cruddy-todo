@@ -11,10 +11,10 @@ exports.create = (text, callback) => {
   // Goal is to create a persistent todo object
   // We created on inner callback function 
   // That accepts a unique id as its sole paramater
-  var createNewFileCallback = (uniqueId) => {
+  var createNewFileCallback = (id) => {
     // Declare the pathname where we wanted to created the
     // Text file that represents the object
-    var path = __dirname + '/data/' + uniqueId + '.txt';
+    var path = __dirname + '/data/' + id + '.txt';
     // Purpose is to create a file with the text inside of it 
     // at that file location
     fs.writeFile(path, text, (err) => {
@@ -23,7 +23,7 @@ exports.create = (text, callback) => {
       if (err) throw err;
       // Otherwise trigger the callback passed in from server.js
       // Callback sends response.body with newly created todo object
-      callback(null, { uniqueId, text });
+      callback(null, { id, text });
     });
   }
   // Calling the get unique ID method that was imported from counter.js
