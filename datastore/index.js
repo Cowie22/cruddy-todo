@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const _ = require('underscore');
 const counter = require('./counter');
+const Promise = require('bluebird');
 
 var items = {};
 
@@ -55,23 +56,27 @@ exports.readAll = (callback) => {
       var filePath = __dirname + '/data/' + files[i];
       // Reads file defined at the path efined in file path
       fs.readFile(filePath, (err, bufferText) => {
-        var text = bufferText.toString();
-        var id = files[i].split('.')[0];
-        // This is the information in the todo
-        var todo = { id, text };
-        // Push this information to our temp data array
-        data.push(todo);
-        // If i is less than the length of the array, then increment the 
-        // Counter of i and perform the recursive function on the next
-        // File in the files array
-        if (i < files.length - 1) {
-          i++;
-          iterator(i);
-        } else {
-          // Otherwise pass the complete data array containing all our files
-          // Into the callback passed in from server.js which will handle 
-          // Sending the data array to the client
+        if (!bufferText) {
           callback(null, data);
+        } else {
+          var text = bufferText.toString();
+          var id = files[i].split('.')[0];
+          // This is the information in the todo
+          var todo = { id, text };
+          // Push this information to our temp data array
+          data.push(todo);
+          // If i is less than the length of the array, then increment the 
+          // Counter of i and perform the recursive function on the next
+          // File in the files array
+          if (i < files.length - 1) {
+            i++;
+            iterator(i);
+          } else {
+            // Otherwise pass the complete data array containing all our files
+            // Into the callback passed in from server.js which will handle 
+            // Sending the data array to the client
+            callback(null, data);
+          }
         }
       });
     };
@@ -80,44 +85,50 @@ exports.readAll = (callback) => {
   });
 };
 
-exports.readOne = (id, callback) => {
-  var path = __dirname + '/data/' + id + '.txt';
-  fs.readFile(path, (err, bufferText) => {
-    if (!bufferText) {
-      callback(new Error(`No item with id: ${id}`));
-    } else {
-      var text = bufferText.toString();
-      callback(null, { id, text });
-    }
-  });
+exports.readOne = (id) => {
+  return new Promise((resolve, reject) => {
+    var path = __dirname + '/data/' + id + '.txt';
+    fs.readFile(path, (err, bufferText) => {
+      if (!bufferText) {
+        reject(new Error(`No item with id: ${id}`));
+      } else {
+        var text = bufferText.toString();
+        resolve({ id, text });
+      }
+    });
+  })
 };
 
-exports.update = (id, text, callback) => {
-  var path = __dirname + '/data/' + id + '.txt';
-  fs.readFile(path, (err, bufferText) => {
-    if (err) {
-      callback(new Error(`No item with id: ${id}`));
-    } else {
-      fs.writeFile(path, text, (err) => {
-        if (err) {
-          callback(new Error(`No item with id: ${id}`));
-        } else {
-          callback(null, { id, text });
-        }
-      });
-    }
-  });
+exports.update = (id, text) => {
+  return new Promise((resolve, reject) => {
+    var path = __dirname + '/data/' + id + '.txt';
+    fs.readFile(path, (err, bufferText) => {
+      if (err) {
+        reject(new Error(`No item with id: ${id}`));
+      } else {
+        fs.writeFile(path, text, (err) => {
+          if (err) {
+            reject(new Error(`No item with id: ${id}`));
+          } else {
+            resolve({ id, text });
+          }
+        });
+      }
+    });
+  })
 };
 
 exports.delete = (id, callback) => {
-  var path = __dirname + '/data/' + id + '.txt';
-  fs.unlink(path, (err) => {
-    if (err) {
-      callback(new Error(`No item with id: ${id}`));
-    } else {
-      callback();
-    }
-  });
+  return new Promise((resolve, reject) => {
+    var path = __dirname + '/data/' + id + '.txt';
+    fs.unlink(path, (err) => {
+      if (err) {
+        reject(new Error(`No item with id: ${id}`));
+      } else {
+        resolve();
+      }
+    });
+  })
 };
 
 // Config+Initialization code -- DO NOT MODIFY /////////////////////////////////

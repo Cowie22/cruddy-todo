@@ -42,35 +42,35 @@ app.get('/todo', (req, res) => {
 
 // Read one (cRud) -- member route
 app.get('/todo/:id', (req, res) => {
-  Todo.readOne(req.params.id, (err, todo) => {
-    if (todo) {
-      res.status(200).json(todo);
-    } else {
-      res.sendStatus(404);
-    }
-  });
+  Todo.readOne(req.params.id)
+  .then((todo) => {
+    res.status(200).json(todo);
+  })
+  .catch((err) => {
+    res.sendStatus(404);
+  })
 });
 
 // Update (crUd) -- member route
 app.put('/todo/:id', (req, res) => {
-  Todo.update(req.params.id, req.body.todoText, (err, todo) => {
-    if (todo) {
-      res.status(200).json(todo);
-    } else {
-      res.sendStatus(404);
-    }
-  });
+  Todo.update(req.params.id, req.body.todoText)
+  .then((todo) => {
+    res.status(200).json(todo);
+  })
+  .catch((err) => {
+    res.sendStatus(404);
+  }) 
 });
 
 // Delete (cruD) -- member route
 app.delete('/todo/:id', (req, res) => {
-  Todo.delete(req.params.id, (err) => {
-    if (err) {
-      res.sendStatus(404);
-    } else {
-      res.sendStatus(204);
-    }
-  });
+  Todo.delete(req.params.id)
+  .then(() => {
+    res.sendStatus(204);
+  })
+  .catch((err) => {
+    res.sendStatus(404);
+  })
 });
 
 // Start & Initialize Web Server ///////////////////////////////////////////////
