@@ -20,13 +20,14 @@ app.use(express.static(path.join(__dirname, './public')));
 
 // Create (Crud) -- collection route
 app.post('/todo', (req, res) => {
-  Todo.create(req.body.todoText, (err, newTodo) => {
-    if (err) {
-      res.sendStatus(400);
-    } else {
-      res.status(201).json(newTodo);
-    }
-  });
+  Todo.create(req.body.todoText) // Promise .then .catch
+  .then((newTodo) => {
+    res.status(201)
+    res.json(newTodo);
+  })
+  .catch((err) => {
+    res.sendStatus(400);
+  })
 });
 
 // Read all (cRud) -- collection route

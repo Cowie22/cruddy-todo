@@ -7,12 +7,11 @@ const Promise = require('bluebird');
 var items = {};
 
 // Public API - Fix these CRUD functions ///////////////////////////////////////
-
-exports.create = (text, callback) => {
-  // Goal is to create a persistent todo object
-  // We created on inner callback function 
-  // That accepts a unique id as its sole paramater
-  var createNewFileCallback = (id) => {
+// Goal is to create a persistent todo object
+// We created on inner callback function 
+// That accepts a unique id as its sole paramater
+var createNewFileCallback = (id, text) => {
+  return new Promise((resolve, reject) => {
     // Declare the pathname where we wanted to created the
     // Text file that represents the object
     var path = __dirname + '/data/' + id + '.txt';
@@ -21,18 +20,27 @@ exports.create = (text, callback) => {
     fs.writeFile(path, text, (err) => {
       // If there is an error, such as invalid path, or permission error
       // Throw an error
-      if (err) { throw err; }
+      if (err) { 
+        reject(err); 
+      }
       // Otherwise trigger the callback passed in from server.js
       // Callback sends response.body with newly created todo object
-      callback(null, { id, text });
+      resolve({ id, text });
     });
-  };
+  })
+}
+
+exports.create = (text) => {
   // Calling the get unique ID method that was imported from counter.js
   // This method grabs a persistently unique ID from our database
   // Because of the asynchrounous nature, we have to pass our callback into
   // The function, otherwise getNextUniqueId won't be able to return the 
   // Generated Unique id to our create new file function.
-  counter.getNextUniqueId(createNewFileCallback);
+  return counter.getNextUniqueId()
+  .then((uniqueId) => {
+    return createNewFileCallback(uniqueId, text)
+  })
+
 };
 
 // The purpose of this function is to read all of the Text documents
